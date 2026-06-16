@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atmosphere | Modern Weather App</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    /* Modern UI CSS Reset & Variables */
+:root {
+    --glass-bg: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --glass-shadow: rgba(0, 0, 0, 0.25);
+    --text-main: #ffffff;
+    --text-muted: #ccccff;
+    --accent-glow: #6c5ce7;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    transition: background 0.8s ease-in-out;
+    background-size: cover;
+    background-position: center;
+}
+
+/* Dynamic Backgrounds (Additional Challenge) */
+.default-bg { background: linear-gradient(135deg, #0f172a, #1e293b); }
+.clear-bg { background: linear-gradient(135deg, #1e3c72, #2a5298); }
+.clouds-bg { background: linear-gradient(135deg, #3a7bd5, #3a6073); }
+.rain-bg { background: linear-gradient(135deg, #2b5876, #4e4376); }
+.snow-bg { background: linear-gradient(135deg, #83a4d4, #b6fbff); }
+.thunderstorm-bg { background: linear-gradient(135deg, #141e30, #243b55); }
+
+/* Main Aesthetic Glass Container */
+.app-container {
+    width: 90%;
+    max-width: 420px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 32px;
+    padding: 32px;
+    box-shadow: 0 20px 40px var(--glass-shadow);
+    color: var(--text-main);
+    transition: all 0.4s ease;
+}
+
+/* Header / Search Customization */
+.search-section {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.input-wrapper {
+    position: relative;
+    flex: 1;
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 16px;
+}
+
+#city-input {
+    width: 100%;
+    padding: 14px 16px 14px 46px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    color: white;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+#city-input:focus {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+#city-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.action-btn {
+    width: 48px;
+    height: 48px;
+    border: none;
+    background: white;
+    color: #0f172a;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+}
+
+.action-btn.secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid var(--glass-border);
+}
+
+.action-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Info Dashboard Layout */
+.main-info {
+    text-align: center;
+    margin-top: 10px;
+}
+
+#location {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+#date {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.weather-icon-box {
+    margin: 20px 0;
+    height: 110px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#weather-icon {
+    width: 100px;
+    height: 100px;
+    filter: drop-shadow(0px 8px 12px rgba(0,0,0,0.15));
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+}
+
+#temperature {
+    font-size: 64px;
+    font-weight: 300;
+    letter-spacing: -2px;
+    line-height: 1;
+}
+
+#description {
+    font-size: 16px;
+    text-transform: capitalize;
+    color: var(--text-muted);
+    margin-top: 8px;
+    font-weight: 500;
+}
+
+/* Minimal Grid Stats */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 32px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 16px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.stat-card i {
+    font-size: 22px;
+}
+
+.blue-icon { color: #38bdf8; }
+.teal-icon { color: #2dd4bf; }
+
+.stat-info span {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.stat-info strong {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* Error States styling */
+.error-card {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 16px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #fca5a5;
+    margin-top: 10px;
+}
+
+/* Welcome Placeholder Screen */
+.welcome-box {
+    text-align: center;
+    padding: 40px 0;
+}
+
+.welcome-logo {
+    font-size: 60px;
+    margin-bottom: 16px;
+    opacity: 0.7;
+}
+
+.welcome-box h3 { margin-bottom: 6px; font-weight: 600; }
+.welcome-box p { color: var(--text-muted); font-size: 14px; }
+
+/* System Classes */
+.hidden { display: none !important; }
+
+</style>
+<body class="default-bg">
+    <div class="app-container">
+        
+        <header class="search-section">
+            <div class="input-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="city-input" placeholder="Search city...">
+            </div>
+            <button id="search-btn" class="action-btn" title="Search"><i class="fa-solid fa-arrow-right"></i></button>
+            <button id="geo-btn" class="action-btn secondary" title="Use Current Location"><i class="fa-solid fa-location-crosshairs"></i></button>
+        </header>
+
+        <div id="error-container" class="error-card hidden">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <p id="error-text">City not found. Please try again!</p>
+        </div>
+
+        <main id="weather-body" class="weather-body hidden">
+            <div class="main-info">
+                <h1 id="location">London, UK</h1>
+                <p id="date">Tuesday, 16 June</p>
+                <div class="weather-icon-box">
+                    <img id="weather-icon" src="" alt="Weather Icon">
+                </div>
+                <h2 id="temperature">24°C</h2>
+                <p id="description">Partly Cloudy</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fa-solid fa-droplet blue-icon"></i>
+                    <div class="stat-info">
+                        <span>Humidity</span>
+                        <strong id="humidity">64%</strong>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fa-solid fa-wind teal-icon"></i>
+                    <div class="stat-info">
+                        <span>Wind Speed</span>
+                        <strong id="wind">12 km/h</strong>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div id="welcome-message" class="welcome-box">
+            <i class="fa-solid fa-cloud-sun-rain welcome-logo"></i>
+            <h3>Atmosphere App</h3>
+            <p>Enter a city or use your location to see the magic.</p>
+        </div>
+
+    </div>
+
+    <script>
+        // OpenWeatherMap API Configuration
+const API_KEY = "8f480371a39f60a92d05f32997e3a3bf"; 
+
+const cityInput = document.getElementById('city-input');
+const searchBtn = document.getElementById('search-btn');
+const geoBtn = document.getElementById('geo-btn');
+const weatherBody = document.getElementById('weather-body');
+const welcomeMessage = document.getElementById('welcome-message');
+const errorContainer = document.getElementById('error-container');
+const errorText = document.getElementById('error-text');
+
+// Elements to update
+const locationEl = document.getElementById('location');
+const dateEl = document.getElementById('date');
+const weatherIconEl = document.getElementById('weather-icon');
+const tempEl = document.getElementById('temperature');
+const descEl = document.getElementById('description');
+const humidityEl = document.getElementById('humidity');
+const windEl = document.getElementById('wind');
+
+// Event Listeners
+searchBtn.addEventListener('click', () => handleSearch());
+cityInput.addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') handleSearch();
+});
+geoBtn.addEventListener('click', () => getUserLocation());
+
+// Main Search Logic
+function handleSearch() {
+    const cityName = cityInput.value.trim();
+    if (cityName) {
+        fetchWeatherData(cityName);
+    }
+}
+
+// Fetch weather by City Name
+async function fetchWeatherData(city) {
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`;
+    executeFetch(url);
+}
+
+// Additional Challenge: Geolocation API
+function getUserLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
+                executeFetch(url);
+            },
+            () => {
+                showError("Location access denied. Please type city manually.");
+            }
+        );
+    } else {
+        showError("Geolocation is not supported by your browser.");
+    }
+}
+
+// Common fetch executor
+async function executeFetch(url) {
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!response.ok) {
+            // Error handling for incorrect city names
+            throw new Error(data.message || "City not found");
+        }
+
+        displayWeather(data);
+    } catch (error) {
+        showError(error.message);
+    }
+}
+
+// Dynamic DOM Update & Theme shift
+function displayWeather(data) {
+    // Hide welcome and error layers
+    welcomeMessage.classList.add('hidden');
+    errorContainer.classList.add('hidden');
+    weatherBody.classList.remove('hidden');
+
+    // Setting details
+    locationEl.textContent = `${data.name}, ${data.sys.country}`;
+    tempEl.textContent = `${Math.round(data.main.temp)}°C`;
+    descEl.textContent = data.weather[0].description;
+    humidityEl.textContent = `${data.main.humidity}%`;
+    windEl.textContent = `${Math.round(data.wind.speed * 3.6)} km/h`; // converts m/s to km/h
+
+    // Set Date format
+    const options = { weekday: 'long', day: 'numeric', month: 'short' };
+    dateEl.textContent = new Date().toLocaleDateString('en-US', options);
+
+    // Weather Icon processing
+    const iconCode = data.weather[0].icon;
+    weatherIconEl.src = `https://openweathermap.org/img/wn/${iconCode}@4x.png`;
+
+    // Additional Challenge: Dynamic Background Image/Color theme based on weather status
+    updateThemeBackground(data.weather[0].main);
+}
+
+// Theme Background Management
+function updateThemeBackground(status) {
+    document.body.className = ''; // reset previous state
+    
+    switch (status.toLowerCase()) {
+        case 'clear':
+            document.body.classList.add('clear-bg');
+            break;
+        case 'clouds':
+            document.body.classList.add('clouds-bg');
+            break;
+        case 'rain':
+        case 'drizzle':
+            document.body.classList.add('rain-bg');
+            break;
+        case 'snow':
+            document.body.classList.add('snow-bg');
+            break;
+        case 'thunderstorm':
+            document.body.classList.add('thunderstorm-bg');
+            break;
+        default:
+            document.body.classList.add('default-bg');
+            break;
+    }
+}
+
+// Error Rendering Helper
+function showError(msg) {
+    weatherBody.classList.add('hidden');
+    welcomeMessage.classList.add('hidden');
+    errorContainer.classList.remove('hidden');
+    // Capitalize error message first letter
+    errorText.textContent = msg.charAt(0).toUpperCase() + msg.slice(1);
+}
+    </script>
+</body>
+</html>
